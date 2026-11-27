@@ -20,6 +20,7 @@ export default function Guides() {
     <p style={{color:"#2563eb",fontWeight:700}}>TOOLORA LEARNING CENTER</p>
     <h1>How to Use Toolora's Free Online Tools</h1>
     <p>These practical guides explain what each tool does, how to use it and what to check before relying on the result. Toolora processes selected files in your browser; some tools load conversion libraries from third-party content delivery networks.</p>
+    <nav aria-label="Detailed guides" style={{display:"flex",flexWrap:"wrap",gap:16,margin:"20px 0"}}><a href="/guides/image-tools">Image resizing and compression</a><a href="/guides/pdf-tools">PDF creation and conversion</a><a href="/guides/office-tools">Word, Excel and PowerPoint to PDF</a></nav>
     {sections.map((section, index) => <section key={section.title} style={{padding:"18px 0",borderBottom:"1px solid #e5eaf1"}}>
       <h2>{index + 1}. {section.title}</h2>
       <ol>{section.steps.map(step => <li key={step}>{step}</li>)}</ol>
@@ -43,6 +44,8 @@ export default function Guides() {
     <p dir="rtl">اختار Excel إلى PDF أو Word إلى PDF أو PowerPoint إلى PDF، وبعدها حدد ملف XLSX أو DOCX أو PPTX. التحويل الحالي يستخرج النصوص والجداول وينشئ PDF بسيطاً، لكنه لا يحافظ على التصميم الأصلي أو الصور والرسوم والحركات.</p>
     <h2 dir="rtl">نصائح قبل تحويل الملفات المهمة</h2>
     <ul dir="rtl"><li>احتفظ بنسخة أصلية من الملف.</li><li>راجع النتيجة في البرنامج اللي بتستخدمه فيه.</li><li>لا تستخدم أي خدمة لمعالجة مستندات سرية إلا بعد مراجعة سياسة الخصوصية.</li><li>تذكر أن التحويل الآلي مش مضمون يكون مطابقاً للأصل في كل الحالات.</li></ul>
+    <h2 dir="rtl">أدلة تفصيلية إضافية</h2>
+    <ul dir="rtl"><li><a href="/guides/image-tools">شرح تغيير أبعاد الصور وضغطها</a></li><li><a href="/guides/pdf-tools">دليل إنشاء وتحويل ملفات PDF</a></li><li><a href="/guides/office-tools">تحويل ملفات Word وExcel وPowerPoint إلى PDF</a></li></ul>
     <p dir="rtl"><a href="/">العودة لأدوات Toolora</a> · <a href="/contact">التواصل معنا</a></p>
   </main>;
 }
