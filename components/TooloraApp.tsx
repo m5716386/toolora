@@ -176,7 +176,7 @@ async function pdfText(file: File): Promise<string> {
 async function makePdfExcel(file: File): Promise<Blob> {
   await loadLibrary("https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js", () => !!window.XLSX);
   const rows = await extractPdfLines(file);
-  const normalized = rows.map(row => row.length > 1 ? row : (row[0] || "").split(/\\s{2,}|\\t/).map(x => x.trim())).filter(row => row.some(cell => cell.trim()));
+  const normalized = rows.map(row => row.length > 1 ? row : (row[0] || "").split(/\s{2,}|\t/).map(x => x.trim())).filter(row => row.some(cell => cell.trim()));
   const sheet = window.XLSX.utils.aoa_to_sheet(normalized);
   const book = window.XLSX.utils.book_new();
   window.XLSX.utils.book_append_sheet(book, sheet, "PDF Data");
@@ -184,9 +184,9 @@ async function makePdfExcel(file: File): Promise<Blob> {
 }
 async function makeTextExcel(value: string): Promise<Blob> {
   await loadLibrary("https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js", () => !!window.XLSX);
-  const lines = value.replace(/\\r/g, "").split("\\n").filter(line => line.trim());
+  const lines = value.replace(/\r/g, "").split("\n").filter(line => line.trim());
   const rows = lines.map(line => {
-    const delimiter = line.includes("\\t") ? "\\t" : line.includes(";") ? ";" : line.includes(",") ? "," : null;
+    const delimiter = line.includes("\t") ? "\t" : line.includes(";") ? ";" : line.includes(",") ? "," : null;
     return delimiter ? line.split(delimiter).map(cell => cell.trim()) : [line.trim()];
   });
   const sheet = window.XLSX.utils.aoa_to_sheet(rows);
@@ -197,7 +197,7 @@ async function makeTextExcel(value: string): Promise<Blob> {
 async function makePdfWord(file: File): Promise<Blob> {
   await loadLibrary("https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js", () => !!window.docx);
   const content = await pdfText(file);
-  const paragraphs = content.split("\\n").map(line => new window.docx.Paragraph({ children: [new window.docx.TextRun(line)] }));
+  const paragraphs = content.split("\n").map(line => new window.docx.Paragraph({ children: [new window.docx.TextRun(line)] }));
   const documentFile = new window.docx.Document({ sections: [{ children: paragraphs }] });
   return window.docx.Packer.toBlob(documentFile);
 }
