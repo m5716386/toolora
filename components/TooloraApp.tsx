@@ -139,7 +139,7 @@ const tools: { id: Tool; group: "images" | "pdf"; icon: string }[] = [
 declare global {
   interface Window { pdfjsLib?: any; XLSX?: any; docx?: any; JSZip?: any; }
 }
-const scriptLoads: Record<string, Promise<void>> = {};
+const scriptLoads: Partial<Record<string, Promise<void>>> = {};
 function loadLibrary(src: string, ready: () => boolean): Promise<void> {
   if (ready()) return Promise.resolve();
   if (scriptLoads[src]) return scriptLoads[src];
