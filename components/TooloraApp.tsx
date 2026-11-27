@@ -471,8 +471,8 @@ export default function TooloraApp() {
         <div className="workspaceHead"><div><span className="sectionKicker">{groupName}</span><h2>{toolName}</h2></div><button className="clearButton" onClick={() => { setFiles([]); setText(""); resetOutput(); }}>{t.clear}</button></div>
 
         {(active === "resize" || active === "compress" || active === "imagepdf") && <div className="toolForm">
-          <label className="uploadBox"><span className="uploadIcon">＋</span><strong>{t.select}</strong><small>{active === "imagepdf" ? t.chooseImage : t.chooseImage}</small>
-            <input type="file" multiple={active === "imagepdf"} accept="image/*" onChange={e => setFiles(Array.from(e.target.files || []))} />
+          <label className="uploadBox"><span className="uploadIcon">＋</span><strong>{t.select}</strong><small>{t.chooseImage}</small>
+            <input type="file" multiple={active === "imagepdf"} accept="image/jpeg,image/png,image/webp" onChange={e => setFiles(Array.from(e.target.files || []))} />
           </label>
           {files.length > 0 && <p className="fileList">{files.map(f => f.name).join(" • ")}</p>}
           {(active === "resize" || active === "compress") && <label>{t.imageQuality}: {Math.round(Number(quality) * 100)}%<input type="range" min="0.2" max="1" step="0.05" value={quality} onChange={e => setQuality(e.target.value)} /></label>}
@@ -480,12 +480,23 @@ export default function TooloraApp() {
             <div className="twoFields"><label>{t.width}<input className="field" type="number" min="1" max="12000" value={width} onChange={e => setWidth(e.target.value)} /></label><label>{t.height}<input className="field" type="number" min="1" max="12000" value={height} onChange={e => setHeight(e.target.value)} /></label></div>
             <label className="checkLabel"><input type="checkbox" checked={keepRatio} onChange={e => setKeepRatio(e.target.checked)} /> {t.keepRatio}</label>
           </>}
+          {active === "imagepdf" && <p className="privacyNote">{t.jpgPdfNote}</p>}
           <button className="primaryButton" onClick={processTool}>{t.run}</button>
           <p className="privacyNote">🔒 {t.privacy}</p>
         </div>}
 
-        {active === "textpdf" && <div className="toolForm">
-          <label>{t.textLabel}<textarea className="textArea" rows={10} value={text} onChange={e => setText(e.target.value)} placeholder={t.textHint} /></label>
+        {(active === "pdfexcel" || active === "pdfword" || active === "pdfjpg") && <div className="toolForm">
+          <label className="uploadBox"><span className="uploadIcon">＋</span><strong>{t.select}</strong><small>{t.pdfHint}</small>
+            <input type="file" accept="application/pdf,.pdf" onChange={e => setFiles(Array.from(e.target.files || []))} />
+          </label>
+          {files.length > 0 && <p className="fileList">{files.map(f => f.name).join(" • ")}</p>}
+          <p className="privacyNote">{t.conversionNote}</p>
+          <button className="primaryButton" onClick={processTool}>{t.run}</button>
+          <p className="privacyNote">🔒 {t.privacy}</p>
+        </div>}
+
+        {(active === "textpdf" || active === "textxlsx") && <div className="toolForm">
+          <label>{t.textLabel}<textarea className="textArea" rows={10} value={text} onChange={e => setText(e.target.value)} placeholder={active === "textxlsx" ? t.textExcelHint : t.textHint} /></label>
           <button className="primaryButton" onClick={processTool}>{t.run}</button>
           <p className="privacyNote">🔒 {t.privacy}</p>
         </div>}
