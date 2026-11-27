@@ -152,6 +152,10 @@ function loadLibrary(src: string, ready: () => boolean): Promise<void> {
     script.onload = () => ready() ? resolve() : reject(new Error("A conversion library could not be initialized."));
     script.onerror = () => reject(new Error("Could not load a required conversion library. Check your internet connection and try again."));
     if (!existing) document.head.appendChild(script);
+  }).catch(error => {
+    delete scriptLoads[src];
+    document.querySelector(`script[data-toolora-lib="${src}"]`)?.remove();
+    throw error;
   });
   return scriptLoads[src];
 }
