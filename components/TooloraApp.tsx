@@ -1,158 +1,216 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { PDFDocument } from "pdf-lib";
 
 type Lang = "en" | "ar";
-type Tool = "merge" | "split" | "image" | "resize" | "percent" | "discount" | "loan" | "words" | "case" | "spaces";
+type Tool = "resize" | "compress" | "textpdf" | "imagepdf";
 
 const copy = {
   en: {
-    tagline: "All your tools. One place.",
-    intro: "Fast, free tools for everyday tasks. Your files stay on your device whenever possible.",
+    tagline: "Simple tools. Beautiful results.",
+    intro: "Free, fast image and PDF tools. Your files are processed on your device.",
     search: "Search for a tool...",
     all: "All tools",
-    pdf: "PDF tools",
     images: "Image tools",
-    calc: "Calculators",
-    text: "Text tools",
+    pdf: "PDF tools",
     choose: "Choose a tool to get started",
-    merge: "Merge PDF files",
-    split: "Extract PDF pages",
-    image: "Compress an image",
     resize: "Resize an image",
-    percent: "Percentage calculator",
-    discount: "Discount calculator",
-    loan: "Loan payment calculator",
-    words: "Word counter",
-    case: "Change text case",
-    spaces: "Remove extra spaces",
-    select: "Select files",
-    run: "Process",
+    compress: "Compress an image",
+    textpdf: "Text to PDF",
+    imagepdf: "Images to PDF",
+    select: "Choose files",
+    run: "Create result",
     download: "Download result",
     clear: "Clear",
     result: "Result",
-    privacy: "Files are processed in your browser and are not uploaded to Toolora.",
-    footer: "Free online tools • Built for everyone",
-    number: "Enter a number",
-    rate: "Enter percentage",
-    price: "Original price",
-    discountRate: "Discount percentage",
-    principal: "Loan amount",
-    interest: "Annual interest rate (%)",
-    months: "Number of months",
-    monthly: "Estimated monthly payment",
-    wordsLabel: "Your text",
-    chars: "Characters",
-    wordCount: "Words",
-    sentence: "Sentences",
-    uppercase: "UPPERCASE",
-    lowercase: "lowercase",
-    titlecase: "Title Case",
-    imageQuality: "Image quality",
+    privacy: "Your files are processed in your browser and are not uploaded to Toolora.",
+    footer: "Free online image and PDF tools • Built for everyone",
+    imageQuality: "Output quality",
     width: "Width (px)",
     height: "Height (px)",
+    textLabel: "Write or paste your text",
+    textHint: "Your text will be arranged across pages automatically.",
     error: "Something went wrong. Check your file and try again.",
-    needFile: "Please choose a file first.",
-    pages: "Pages to extract (example: 1,3,5)",
-    splitHint: "Page numbers start at 1. This creates a new PDF with the selected pages.",
-    savings: "You save",
-    finalPrice: "Price after discount",
-    resultValue: "Result"
+    needFile: "Please choose at least one file first.",
+    resizeDone: "Your resized image is ready.",
+    compressDone: "Your compressed image is ready.",
+    textDone: "Your PDF has been created.",
+    imageDone: "Your PDF has been created.",
+    chooseImage: "JPG, PNG or WEBP images",
+    keepRatio: "Keep original proportions",
+    noText: "Please enter some text first."
   },
   ar: {
-    tagline: "كل أدواتك. في مكان واحد.",
-    intro: "أدوات مجانية وسريعة لمهامك اليومية. ملفاتك تبقى على جهازك قدر الإمكان.",
+    tagline: "أدوات بسيطة. نتائج ممتازة.",
+    intro: "أدوات مجانية وسريعة للصور وملفات PDF. تتم معالجة ملفاتك على جهازك.",
     search: "ابحث عن أداة...",
     all: "كل الأدوات",
-    pdf: "أدوات PDF",
     images: "أدوات الصور",
-    calc: "الحاسبات",
-    text: "أدوات النصوص",
+    pdf: "أدوات PDF",
     choose: "اختار أداة للبدء",
-    merge: "دمج ملفات PDF",
-    split: "استخراج صفحات PDF",
-    image: "ضغط صورة",
-    resize: "تغيير حجم صورة",
-    percent: "حاسبة النسبة المئوية",
-    discount: "حاسبة الخصم",
-    loan: "حاسبة القسط الشهري",
-    words: "عداد الكلمات",
-    case: "تغيير حالة الأحرف",
-    spaces: "إزالة المسافات الزائدة",
+    resize: "تغيير أبعاد الصورة",
+    compress: "ضغط الصورة",
+    textpdf: "تحويل النص إلى PDF",
+    imagepdf: "تحويل الصور إلى PDF",
     select: "اختيار الملفات",
-    run: "تنفيذ",
+    run: "إنشاء النتيجة",
     download: "تنزيل النتيجة",
     clear: "مسح",
     result: "النتيجة",
-    privacy: "تتم معالجة الملفات في متصفحك ولا يتم رفعها إلى Toolora.",
-    footer: "أدوات مجانية عبر الإنترنت • للجميع",
-    number: "أدخل الرقم",
-    rate: "أدخل النسبة المئوية",
-    price: "السعر الأصلي",
-    discountRate: "نسبة الخصم",
-    principal: "مبلغ القرض",
-    interest: "الفائدة السنوية (%)",
-    months: "عدد الأشهر",
-    monthly: "القسط الشهري التقريبي",
-    wordsLabel: "النص",
-    chars: "الأحرف",
-    wordCount: "الكلمات",
-    sentence: "الجمل",
-    uppercase: "أحرف كبيرة",
-    lowercase: "أحرف صغيرة",
-    titlecase: "أول حرف كبير",
+    privacy: "تتم معالجة ملفاتك في المتصفح ولا يتم رفعها إلى Toolora.",
+    footer: "أدوات مجانية للصور وPDF • للجميع",
     imageQuality: "جودة الصورة",
     width: "العرض (بكسل)",
     height: "الارتفاع (بكسل)",
+    textLabel: "اكتب النص أو الصقه هنا",
+    textHint: "سيتم توزيع النص تلقائياً على صفحات PDF.",
     error: "حدث خطأ. تأكد من الملف وحاول مرة أخرى.",
-    needFile: "اختار ملف أولاً.",
-    pages: "أرقام الصفحات (مثال: 1,3,5)",
-    splitHint: "ترقيم الصفحات يبدأ من 1. سيتم إنشاء PDF جديد بالصفحات المحددة.",
-    savings: "قيمة التوفير",
-    finalPrice: "السعر بعد الخصم",
-    resultValue: "النتيجة"
+    needFile: "اختار صورة واحدة على الأقل أولاً.",
+    resizeDone: "الصورة بعد تغيير أبعادها جاهزة.",
+    compressDone: "الصورة المضغوطة جاهزة.",
+    textDone: "تم إنشاء ملف PDF بنجاح.",
+    imageDone: "تم إنشاء ملف PDF بنجاح.",
+    chooseImage: "صور JPG أو PNG أو WEBP",
+    keepRatio: "الحفاظ على تناسب الأبعاد الأصلية",
+    noText: "اكتب نصاً أولاً."
   }
 };
 
-const tools: { id: Tool; group: "pdf" | "images" | "calc" | "text"; icon: string }[] = [
-  { id: "merge", group: "pdf", icon: "📑" }, { id: "split", group: "pdf", icon: "✂️" },
-  { id: "image", group: "images", icon: "🗜️" }, { id: "resize", group: "images", icon: "🖼️" },
-  { id: "percent", group: "calc", icon: "%" }, { id: "discount", group: "calc", icon: "🏷️" },
-  { id: "loan", group: "calc", icon: "💳" }, { id: "words", group: "text", icon: "📝" },
-  { id: "case", group: "text", icon: "🔠" }, { id: "spaces", group: "text", icon: "↔️" }
+const tools: { id: Tool; group: "images" | "pdf"; icon: string }[] = [
+  { id: "resize", group: "images", icon: "↔️" },
+  { id: "compress", group: "images", icon: "🗜️" },
+  { id: "textpdf", group: "pdf", icon: "📝" },
+  { id: "imagepdf", group: "pdf", icon: "🖼️" }
 ];
+
+function loadImage(file: File): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const image = new Image();
+    image.onload = () => { URL.revokeObjectURL(url); resolve(image); };
+    image.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Could not read this image.")); };
+    image.src = url;
+  });
+}
+
+function canvasBlob(canvas: HTMLCanvasElement, quality: number): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error("Could not process this image.")), "image/jpeg", quality);
+  });
+}
+
+async function makeTextPdf(value: string, rtl: boolean): Promise<Uint8Array> {
+  const pdf = await PDFDocument.create();
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Canvas is not supported in this browser.");
+
+  const pageWidth = 1240;
+  const pageHeight = 1754;
+  const margin = 100;
+  const maxWidth = pageWidth - margin * 2;
+  const lineHeight = 48;
+  canvas.width = pageWidth;
+  canvas.height = pageHeight;
+
+  const font = '30px Arial, "Noto Naskh Arabic", sans-serif';
+  ctx.font = font;
+  ctx.fillStyle = "#172033";
+  ctx.textBaseline = "top";
+  ctx.direction = rtl ? "rtl" : "ltr";
+  const align: CanvasTextAlign = rtl ? "right" : "left";
+  const x = rtl ? pageWidth - margin : margin;
+  const lines: string[] = [];
+
+  for (const paragraph of value.replace(/\r/g, "").split("\n")) {
+    if (!paragraph.trim()) { lines.push(""); continue; }
+    const words = paragraph.split(/\s+/);
+    let line = "";
+    for (const word of words) {
+      const candidate = line ? line + " " + word : word;
+      if (ctx.measureText(candidate).width > maxWidth && line) {
+        lines.push(line);
+        line = word;
+      } else line = candidate;
+    }
+    if (line) lines.push(line);
+  }
+
+  let y = margin;
+  const addPage = () => {
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, pageWidth, pageHeight);
+    ctx.fillStyle = "#172033";
+    ctx.font = font;
+    ctx.textBaseline = "top";
+    ctx.direction = rtl ? "rtl" : "ltr";
+    ctx.textAlign = align;
+    y = margin;
+  };
+  addPage();
+
+  for (const line of lines) {
+    if (y + lineHeight > pageHeight - margin) {
+      const blob = await new Promise<Blob>((resolve, reject) => canvas.toBlob(b => b ? resolve(b) : reject(new Error("Could not render PDF page.")), "image/png"));
+      const bytes = new Uint8Array(await blob.arrayBuffer());
+      const embedded = await pdf.embedPng(bytes);
+      const page = pdf.addPage([595.28, 841.89]);
+      page.drawImage(embedded, { x: 0, y: 0, width: 595.28, height: 841.89 });
+      addPage();
+    }
+    if (line) ctx.fillText(line, x, y, maxWidth);
+    y += lineHeight;
+  }
+
+  const lastBlob = await new Promise<Blob>((resolve, reject) => canvas.toBlob(b => b ? resolve(b) : reject(new Error("Could not render PDF page.")), "image/png"));
+  const lastBytes = new Uint8Array(await lastBlob.arrayBuffer());
+  const lastImage = await pdf.embedPng(lastBytes);
+  const lastPage = pdf.addPage([595.28, 841.89]);
+  lastPage.drawImage(lastImage, { x: 0, y: 0, width: 595.28, height: 841.89 });
+  return pdf.save();
+}
 
 export default function TooloraApp() {
   const [lang, setLang] = useState<Lang>("en");
   const [active, setActive] = useState<Tool | null>(null);
   const [query, setQuery] = useState("");
   const [files, setFiles] = useState<File[]>([]);
-  const [pages, setPages] = useState("1");
   const [text, setText] = useState("");
-  const [a, setA] = useState("100");
-  const [b, setB] = useState("10");
-  const [c, setC] = useState("12");
+  const [width, setWidth] = useState("1200");
+  const [height, setHeight] = useState("1200");
   const [quality, setQuality] = useState("0.75");
-  const [width, setWidth] = useState("800");
-  const [height, setHeight] = useState("600");
+  const [keepRatio, setKeepRatio] = useState(true);
   const [result, setResult] = useState("");
   const [downloadUrl, setDownloadUrl] = useState("");
   const [downloadName, setDownloadName] = useState("toolora-result");
   const [error, setError] = useState("");
+  const workspaceRef = useRef<HTMLElement | null>(null);
 
   const t = copy[lang];
   const rtl = lang === "ar";
   const visible = useMemo(() => tools.filter(item => {
-    const label = t[item.id as keyof typeof t] as string;
-    const groupLabel = t[item.group as keyof typeof t] as string;
+    const label = t[item.id];
+    const groupLabel = t[item.group];
     return (label + " " + groupLabel).toLowerCase().includes(query.toLowerCase());
   }), [query, t]);
 
+  useEffect(() => {
+    if (active) workspaceRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [active]);
+
   function resetOutput() {
-    setResult(""); setError("");
+    setResult("");
+    setError("");
     if (downloadUrl) URL.revokeObjectURL(downloadUrl);
     setDownloadUrl("");
+  }
+
+  function chooseTool(id: Tool) {
+    setActive(id);
+    setFiles([]);
+    setText("");
+    resetOutput();
   }
 
   function setOutput(blob: Blob, name: string, message: string) {
@@ -162,63 +220,74 @@ export default function TooloraApp() {
     setResult(message);
   }
 
-  async function processFileTool() {
-    setError(""); setResult("");
+  async function processTool() {
+    setError("");
+    setResult("");
     try {
-      if (!files.length) throw new Error(t.needFile);
-      if (active === "merge") {
-        if (files.length < 2) throw new Error(lang === "ar" ? "اختار ملفين PDF على الأقل." : "Choose at least two PDF files.");
-        const merged = await PDFDocument.create();
-        for (const file of files) {
-          const pdf = await PDFDocument.load(await file.arrayBuffer());
-          const pagesToCopy = await merged.copyPages(pdf, pdf.getPageIndices());
-          pagesToCopy.forEach(page => merged.addPage(page));
-        }
-        setOutput(new Blob([new Uint8Array(await merged.save()).buffer as ArrayBuffer], { type: "application/pdf" }), "toolora-merged.pdf", lang === "ar" ? "تم دمج ملفات PDF بنجاح." : "PDF files merged successfully.");
-      } else if (active === "split") {
-        const source = await PDFDocument.load(await files[0].arrayBuffer());
-        const selected = pages.split(",").map(x => Number(x.trim()) - 1).filter(x => Number.isInteger(x) && x >= 0 && x < source.getPageCount());
-        if (!selected.length) throw new Error(lang === "ar" ? "أرقام الصفحات غير صحيحة." : "No valid page numbers were entered.");
-        const output = await PDFDocument.create();
-        const copied = await output.copyPages(source, selected);
-        copied.forEach(page => output.addPage(page));
-        setOutput(new Blob([new Uint8Array(await output.save()).buffer as ArrayBuffer], { type: "application/pdf" }), "toolora-pages.pdf", lang === "ar" ? "تم استخراج الصفحات." : "Selected pages extracted.");
-      } else {
-        const file = files[0];
-        const img = new Image();
-        const sourceUrl = URL.createObjectURL(file);
-        await new Promise<void>((resolve, reject) => { img.onload = () => resolve(); img.onerror = () => reject(new Error(t.error)); img.src = sourceUrl; });
-        const canvas = document.createElement("canvas");
-        canvas.width = active === "resize" ? Math.max(1, Number(width)) : img.naturalWidth;
-        canvas.height = active === "resize" ? Math.max(1, Number(height)) : img.naturalHeight;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) throw new Error(t.error);
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        const blob = await new Promise<Blob>((resolve, reject) => canvas.toBlob(b => b ? resolve(b) : reject(new Error(t.error)), "image/jpeg", Number(quality)));
-        URL.revokeObjectURL(sourceUrl);
-        setOutput(blob, "toolora-image.jpg", lang === "ar" ? "تم تجهيز الصورة." : "Your image is ready.");
+      if (active === "textpdf") {
+        if (!text.trim()) throw new Error(t.noText);
+        const bytes = await makeTextPdf(text, rtl);
+        setOutput(new Blob([bytes.buffer as ArrayBuffer], { type: "application/pdf" }), "toolora-text.pdf", t.textDone);
+        return;
       }
-    } catch (e) { setError(e instanceof Error ? e.message : t.error); }
-  }
+      if (!files.length) throw new Error(t.needFile);
 
-  function calculate() {
-    const x = Number(a), y = Number(b), z = Number(c);
-    if (active === "percent") setResult(`${x}% ${lang === "ar" ? "من" : "of"} ${y} = ${(x / 100 * y).toFixed(2)}`);
-    if (active === "discount") {
-      const saving = x * y / 100;
-      setResult(`${t.finalPrice}: ${(x - saving).toFixed(2)} • ${t.savings}: ${saving.toFixed(2)}`);
-    }
-    if (active === "loan") {
-      const months = Math.max(1, z);
-      const monthlyRate = y / 100 / 12;
-      const payment = monthlyRate === 0 ? x / months : x * monthlyRate / (1 - Math.pow(1 + monthlyRate, -months));
-      setResult(`${t.monthly}: ${payment.toFixed(2)}`);
+      if (active === "imagepdf") {
+        const pdf = await PDFDocument.create();
+        for (const file of files) {
+          const image = await loadImage(file);
+          const canvas = document.createElement("canvas");
+          canvas.width = image.naturalWidth;
+          canvas.height = image.naturalHeight;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) throw new Error(t.error);
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(image, 0, 0);
+          const blob = await canvasBlob(canvas, 0.92);
+          const bytes = new Uint8Array(await blob.arrayBuffer());
+          const embedded = await pdf.embedJpg(bytes);
+          const pageW = 595.28, pageH = 841.89;
+          const scale = Math.min(pageW / embedded.width, pageH / embedded.height);
+          const w = embedded.width * scale, h = embedded.height * scale;
+          const page = pdf.addPage([pageW, pageH]);
+          page.drawImage(embedded, { x: (pageW - w) / 2, y: (pageH - h) / 2, width: w, height: h });
+        }
+        const bytes = await pdf.save();
+        setOutput(new Blob([bytes.buffer as ArrayBuffer], { type: "application/pdf" }), "toolora-images.pdf", t.imageDone);
+        return;
+      }
+
+      const image = await loadImage(files[0]);
+      const canvas = document.createElement("canvas");
+      let outputWidth = image.naturalWidth;
+      let outputHeight = image.naturalHeight;
+      if (active === "resize") {
+        outputWidth = Math.max(1, Math.min(12000, Number(width) || 1));
+        outputHeight = Math.max(1, Math.min(12000, Number(height) || 1));
+        if (keepRatio) {
+          const ratio = Math.min(outputWidth / image.naturalWidth, outputHeight / image.naturalHeight);
+          outputWidth = Math.max(1, Math.round(image.naturalWidth * ratio));
+          outputHeight = Math.max(1, Math.round(image.naturalHeight * ratio));
+        }
+      }
+      canvas.width = outputWidth;
+      canvas.height = outputHeight;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error(t.error);
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, outputWidth, outputHeight);
+      ctx.drawImage(image, 0, 0, outputWidth, outputHeight);
+      const blob = await canvasBlob(canvas, Number(quality));
+      setOutput(blob, active === "resize" ? "toolora-resized.jpg" : "toolora-compressed.jpg", active === "resize" ? t.resizeDone : t.compressDone);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : t.error);
     }
   }
 
   const selectedTool = active ? tools.find(x => x.id === active) : null;
-  const toolName = active ? t[active as keyof typeof t] as string : "";
-  const groupName = selectedTool ? t[selectedTool.group as keyof typeof t] as string : "";
+  const toolName = active ? t[active] : "";
+  const groupName = selectedTool ? t[selectedTool.group] : "";
 
   return <main dir={rtl ? "rtl" : "ltr"} className="page">
     <header className="topbar">
@@ -240,38 +309,32 @@ export default function TooloraApp() {
     <section id="tools" className="content">
       <div className="sectionHead"><div><span className="sectionKicker">TOOL DIRECTORY</span><h2>{t.all}</h2></div><span className="toolCount">{visible.length} tools</span></div>
       <div className="toolGrid">
-        {visible.map(item => <button key={item.id} className={`toolCard ${active === item.id ? "selected" : ""}`} onClick={() => { setActive(item.id); resetOutput(); }}>
-          <span className="toolIcon">{item.icon}</span><span className="toolTitle">{t[item.id as keyof typeof t]}</span><span className="toolGroup">{t[item.group as keyof typeof t]}</span><span className="cardArrow">↗</span>
+        {visible.map(item => <button key={item.id} className={`toolCard ${active === item.id ? "selected" : ""}`} onClick={() => chooseTool(item.id)}>
+          <span className="toolIcon">{item.icon}</span><span className="toolTitle">{t[item.id]}</span><span className="toolGroup">{t[item.group]}</span><span className="cardArrow">↗</span>
         </button>)}
       </div>
 
-      {active && <section className="workspace">
+      {active && <section ref={workspaceRef} id="workspace" className="workspace">
         <div className="workspaceHead"><div><span className="sectionKicker">{groupName}</span><h2>{toolName}</h2></div><button className="clearButton" onClick={() => { setFiles([]); setText(""); resetOutput(); }}>{t.clear}</button></div>
 
-        {(active === "merge" || active === "split" || active === "image" || active === "resize") && <div className="toolForm">
-          <label className="uploadBox"><span className="uploadIcon">＋</span><strong>{t.select}</strong><small>{active === "merge" ? "PDF files" : active === "split" ? "One PDF file" : "JPG, PNG, WEBP"}</small>
-            <input type="file" multiple={active === "merge"} accept={active === "merge" || active === "split" ? "application/pdf,.pdf" : "image/*"} onChange={e => setFiles(Array.from(e.target.files || []))} />
+        {(active === "resize" || active === "compress" || active === "imagepdf") && <div className="toolForm">
+          <label className="uploadBox"><span className="uploadIcon">＋</span><strong>{t.select}</strong><small>{active === "imagepdf" ? t.chooseImage : t.chooseImage}</small>
+            <input type="file" multiple={active === "imagepdf"} accept="image/*" onChange={e => setFiles(Array.from(e.target.files || []))} />
           </label>
           {files.length > 0 && <p className="fileList">{files.map(f => f.name).join(" • ")}</p>}
-          {active === "split" && <><label>{t.pages}<input className="field" value={pages} onChange={e => setPages(e.target.value)} /></label><small>{t.splitHint}</small></>}
-          {(active === "image" || active === "resize") && <label>{t.imageQuality}: {Math.round(Number(quality) * 100)}%<input type="range" min="0.2" max="1" step="0.05" value={quality} onChange={e => setQuality(e.target.value)} /></label>}
-          {active === "resize" && <div className="twoFields"><label>{t.width}<input className="field" type="number" value={width} onChange={e => setWidth(e.target.value)} /></label><label>{t.height}<input className="field" type="number" value={height} onChange={e => setHeight(e.target.value)} /></label></div>}
-          <button className="primaryButton" onClick={processFileTool}>{t.run}</button>
+          {(active === "resize" || active === "compress") && <label>{t.imageQuality}: {Math.round(Number(quality) * 100)}%<input type="range" min="0.2" max="1" step="0.05" value={quality} onChange={e => setQuality(e.target.value)} /></label>}
+          {active === "resize" && <>
+            <div className="twoFields"><label>{t.width}<input className="field" type="number" min="1" max="12000" value={width} onChange={e => setWidth(e.target.value)} /></label><label>{t.height}<input className="field" type="number" min="1" max="12000" value={height} onChange={e => setHeight(e.target.value)} /></label></div>
+            <label className="checkLabel"><input type="checkbox" checked={keepRatio} onChange={e => setKeepRatio(e.target.checked)} /> {t.keepRatio}</label>
+          </>}
+          <button className="primaryButton" onClick={processTool}>{t.run}</button>
           <p className="privacyNote">🔒 {t.privacy}</p>
         </div>}
 
-        {(active === "percent" || active === "discount" || active === "loan") && <div className="toolForm">
-          <label>{active === "percent" ? t.rate : active === "discount" ? t.price : t.principal}<input className="field" type="number" value={a} onChange={e => setA(e.target.value)} /></label>
-          <label>{active === "percent" ? t.number : active === "discount" ? t.discountRate : t.interest}<input className="field" type="number" value={b} onChange={e => setB(e.target.value)} /></label>
-          {active === "loan" && <label>{t.months}<input className="field" type="number" value={c} onChange={e => setC(e.target.value)} /></label>}
-          <button className="primaryButton" onClick={calculate}>{t.run}</button>
-        </div>}
-
-        {(active === "words" || active === "case" || active === "spaces") && <div className="toolForm">
-          <label>{t.wordsLabel}<textarea className="textArea" rows={6} value={text} onChange={e => setText(e.target.value)} placeholder={t.wordsLabel} /></label>
-          {active === "words" && <div className="metrics"><div><strong>{text.trim() ? text.trim().split(/\s+/).length : 0}</strong><small>{t.wordCount}</small></div><div><strong>{text.length}</strong><small>{t.chars}</small></div><div><strong>{(text.match(/[.!?؟]+/g) || []).length}</strong><small>{t.sentence}</small></div></div>}
-          {active === "case" && <div className="buttonRow"><button className="secondaryButton" onClick={() => setText(text.toUpperCase())}>{t.uppercase}</button><button className="secondaryButton" onClick={() => setText(text.toLowerCase())}>{t.lowercase}</button><button className="secondaryButton" onClick={() => setText(text.replace(/\b\w/g, x => x.toUpperCase()))}>{t.titlecase}</button></div>}
-          {active === "spaces" && <button className="primaryButton" onClick={() => setText(text.replace(/\s+/g, " ").trim())}>{t.run}</button>}
+        {active === "textpdf" && <div className="toolForm">
+          <label>{t.textLabel}<textarea className="textArea" rows={10} value={text} onChange={e => setText(e.target.value)} placeholder={t.textHint} /></label>
+          <button className="primaryButton" onClick={processTool}>{t.run}</button>
+          <p className="privacyNote">🔒 {t.privacy}</p>
         </div>}
 
         {error && <div className="errorBox">{error}</div>}
