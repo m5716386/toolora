@@ -39,6 +39,15 @@ const copy = {
     imageDone: "Your PDF has been created.",
     chooseImage: "JPG, PNG or WEBP images",
     keepRatio: "Keep original proportions",
+    faqTitle: "How to use Toolora",
+    faq1q: "Are my files uploaded to a server?",
+    faq1a: "The current image and PDF tools process selected files in your browser. Toolora does not intentionally upload those files to its servers.",
+    faq2q: "Which image formats are supported?",
+    faq2a: "The image tools accept common browser-supported image formats such as JPG, PNG and WEBP. Output images are currently saved as JPEG.",
+    faq3q: "Can I convert several images into one PDF?",
+    faq3a: "Yes. Choose the Images to PDF tool, select multiple images, and create one PDF with each image placed on its own page.",
+    faq4q: "Is there a cost to use the tools?",
+    faq4a: "The tools currently available on Toolora are free to use. Keep a copy of important original files before processing them.",
     noText: "Please enter some text first."
   },
   ar: {
@@ -73,6 +82,15 @@ const copy = {
     imageDone: "تم إنشاء ملف PDF بنجاح.",
     chooseImage: "صور JPG أو PNG أو WEBP",
     keepRatio: "الحفاظ على تناسب الأبعاد الأصلية",
+    faqTitle: "دليل استخدام Toolora",
+    faq1q: "هل يتم رفع ملفاتي إلى خادم؟",
+    faq1a: "تتم معالجة الملفات التي تختارها أدوات الصور وPDF الحالية داخل متصفحك، ولا ترفعها Toolora عمداً إلى خوادمها.",
+    faq2q: "شن أنواع الصور المدعومة؟",
+    faq2a: "تقبل أدوات الصور الصيغ الشائعة التي يدعمها المتصفح مثل JPG وPNG وWEBP، ويتم حفظ الصور الناتجة حالياً بصيغة JPEG.",
+    faq3q: "نقدر نحول أكثر من صورة إلى ملف PDF واحد؟",
+    faq3a: "نعم. اختار أداة تحويل الصور إلى PDF، وحدد أكثر من صورة، وبعدها أنشئ ملفاً واحداً يحتوي على كل صورة في صفحة مستقلة.",
+    faq4q: "هل استخدام الأدوات مجاني؟",
+    faq4a: "الأدوات المتاحة حالياً في Toolora مجانية. ننصحك بالاحتفاظ بنسخة من ملفاتك الأصلية المهمة قبل معالجتها.",
     noText: "اكتب نصاً أولاً."
   }
 };
