@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { PDFDocument } from "pdf-lib";
 
 type Lang = "en" | "ar";
-type Tool = "resize" | "compress" | "textpdf" | "imagepdf" | "pdfexcel" | "textxlsx" | "pdfword" | "pdfjpg";
+type Tool = "resize" | "compress" | "textpdf" | "imagepdf" | "pdfexcel" | "textxlsx" | "pdfword" | "pdfjpg" | "excelpdf" | "wordpdf" | "pptpdf";
 
 const copy = {
   en: {
@@ -49,15 +49,19 @@ const copy = {
     faq4q: "Is there a cost to use the tools?",
     faq4a: "The tools currently available on Toolora are free to use. Keep a copy of important original files before processing them.",
     noText: "Please enter some text first.",
-    pdfexcel: "PDF to Excel", textxlsx: "Text to Excel", pdfword: "PDF to Word", pdfjpg: "PDF to JPG",
+    pdfexcel: "PDF to Excel", textxlsx: "Text to Excel", pdfword: "PDF to Word", pdfjpg: "PDF to JPG", excelpdf: "Excel to PDF", wordpdf: "Word to PDF", pptpdf: "PowerPoint to PDF",
     textExcelDone: "Your Excel file is ready.",
     pdfHint: "Choose a PDF file", textExcelHint: "Paste rows using commas, tabs or new lines.",
     conversionNote: "PDF conversion works best with text-based PDFs. Scanned documents may require OCR, and converted tables or formatting may need review.",
     jpgPdfNote: "Images to PDF also accepts JPG files.",
+    officeHint: "Choose an .xlsx, .docx or .pptx file as appropriate.",
+    officeNote: "These converters extract text and tables and create a simple PDF. They do not preserve the original Office layout, charts, images, animations or slide design. Only modern .xlsx, .docx and .pptx files are supported.",
+    officeDone: "Your PDF is ready.",
     faq5q: "Can every PDF be converted accurately?", faq5a: "Text-based PDFs usually convert best. Scanned PDFs are images and need OCR before their text or tables can be extracted. Always review converted spreadsheets.",
     faq6q: "Will PDF to Word keep the original layout?", faq6a: "The converter extracts readable text into a Word document. Complex layouts, columns, images and tables may not look exactly like the original.",
     faq7q: "How do I convert PDF pages to JPG?", faq7a: "Choose PDF to JPG, select a PDF, and download a ZIP archive containing one JPG image for each page.",
-    faq8q: "How do I turn text into an Excel file?", faq8a: "Paste your data into Text to Excel. Separate columns with commas, semicolons or tabs, and put each row on a new line."
+    faq8q: "How do I turn text into an Excel file?", faq8a: "Paste your data into Text to Excel. Separate columns with commas, semicolons or tabs, and put each row on a new line.",
+    faq9q: "Can I convert Excel, Word and PowerPoint files to PDF?", faq9a: "Yes. Toolora extracts text and tables from modern XLSX, DOCX and PPTX files and creates a simple PDF. The original page layout and slide design are not preserved."
   },
   ar: {
     tagline: "أدوات بسيطة. نتائج ممتازة.",
@@ -101,15 +105,19 @@ const copy = {
     faq4q: "هل استخدام الأدوات مجاني؟",
     faq4a: "الأدوات المتاحة حالياً في Toolora مجانية. ننصحك بالاحتفاظ بنسخة من ملفاتك الأصلية المهمة قبل معالجتها.",
     noText: "اكتب نصاً أولاً.",
-    pdfexcel: "تحويل PDF إلى Excel", textxlsx: "تحويل النص إلى Excel", pdfword: "تحويل PDF إلى Word", pdfjpg: "تحويل PDF إلى صور JPG",
+    pdfexcel: "تحويل PDF إلى Excel", textxlsx: "تحويل النص إلى Excel", pdfword: "تحويل PDF إلى Word", pdfjpg: "تحويل PDF إلى صور JPG", excelpdf: "تحويل Excel إلى PDF", wordpdf: "تحويل Word إلى PDF", pptpdf: "تحويل PowerPoint إلى PDF",
     textExcelDone: "ملف Excel جاهز للتنزيل.",
     pdfHint: "اختار ملف PDF", textExcelHint: "الصق البيانات، وافصل الأعمدة بفواصل أو علامات جدولة، والصفوف بأسطر جديدة.",
     conversionNote: "أفضل نتيجة تكون مع ملفات PDF النصية. الملفات الممسوحة ضوئياً تحتاج OCR، وقد تحتاج الجداول والتنسيقات إلى مراجعة بعد التحويل.",
     jpgPdfNote: "أداة تحويل الصور إلى PDF تقبل صور JPG أيضاً.",
+    officeHint: "اختار ملف بالصيغة المناسبة: XLSX أو DOCX أو PPTX.",
+    officeNote: "الأدوات تستخرج النصوص والجداول وتحوّلها إلى PDF بسيط. لا تحافظ على تصميم Office الأصلي أو الرسوم البيانية والصور والحركات والتنسيقات. الصيغ المدعومة هي XLSX وDOCX وPPTX الحديثة فقط.",
+    officeDone: "ملف PDF جاهز للتنزيل.",
     faq5q: "هل يمكن تحويل كل ملفات PDF بدقة كاملة؟", faq5a: "الملفات التي تحتوي على نصوص تعطي عادةً أفضل نتيجة. أما الملفات الممسوحة ضوئياً فهي صور وتحتاج OCR لاستخراج النصوص والجداول. راجع ملف Excel بعد التحويل.",
     faq6q: "هل يحافظ تحويل PDF إلى Word على نفس التنسيق؟", faq6a: "الأداة تستخرج النص المقروء وتضعه في مستند Word. التنسيقات المعقدة والأعمدة والصور والجداول قد لا تظهر مثل الملف الأصلي تماماً.",
     faq7q: "كيف نحول صفحات PDF إلى صور JPG؟", faq7a: "اختار أداة PDF إلى JPG وحدد ملف PDF، وبعد التحويل نزّل ملف ZIP يحتوي على صورة JPG مستقلة لكل صفحة.",
-    faq8q: "كيف نحول النص إلى ملف Excel؟", faq8a: "الصق بياناتك في أداة النص إلى Excel. افصل الأعمدة بفواصل أو فاصلة منقوطة أو علامات جدولة، وضع كل صف في سطر جديد."
+    faq8q: "كيف نحول النص إلى ملف Excel؟", faq8a: "الصق بياناتك في أداة النص إلى Excel. افصل الأعمدة بفواصل أو فاصلة منقوطة أو علامات جدولة، وضع كل صف في سطر جديد.",
+    faq9q: "نقدر نحول ملفات Excel وWord وPowerPoint إلى PDF؟", faq9a: "نعم. تستخرج Toolora النصوص والجداول من ملفات XLSX وDOCX وPPTX الحديثة وتنشئ ملف PDF بسيطاً، لكن لا تحافظ على تصميم الصفحات أو الشرائح الأصلي."
   }
 };
 
@@ -121,7 +129,10 @@ const tools: { id: Tool; group: "images" | "pdf"; icon: string }[] = [
   { id: "pdfexcel", group: "pdf", icon: "📊" },
   { id: "textxlsx", group: "pdf", icon: "📋" },
   { id: "pdfword", group: "pdf", icon: "📝" },
-  { id: "pdfjpg", group: "pdf", icon: "🖼️" }
+  { id: "pdfjpg", group: "pdf", icon: "🖼️" },
+  { id: "excelpdf", group: "pdf", icon: "📊" },
+  { id: "wordpdf", group: "pdf", icon: "📄" },
+  { id: "pptpdf", group: "pdf", icon: "📽️" }
 ];
 
 
@@ -228,6 +239,44 @@ async function makePdfJpg(file: File): Promise<Blob> {
     zip.file(`page-${String(pageNo).padStart(3, "0")}.jpg`, await blob.arrayBuffer());
   }
   return zip.generateAsync({ type: "blob", mimeType: "application/zip" });
+}
+\n
+async function officeText(file: File, kind: "excel" | "word" | "powerpoint"): Promise<string> {
+  await loadLibrary("https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js", () => !!window.JSZip);
+  const zip = await window.JSZip.loadAsync(await file.arrayBuffer());
+  if (kind === "excel") {
+    await loadLibrary("https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js", () => !!window.XLSX);
+    const workbook = window.XLSX.read(await file.arrayBuffer(), { type: "array" });
+    return workbook.SheetNames.map((name: string) => {
+      const csv = window.XLSX.utils.sheet_to_csv(workbook.Sheets[name], { FS: " | " });
+      return "Sheet: " + name + "\\n" + csv;
+    }).join("\\n\\n");
+  }
+  const paths = Object.keys(zip.files).filter(path =>
+    kind === "word" ? path === "word/document.xml" :
+    /^ppt\\/slides\\/slide\\d+\\.xml$/.test(path)
+  ).sort((a,b) => {
+    const na = Number(a.match(/(\\d+)\\.xml$/)?.[1] || 0);
+    const nb = Number(b.match(/(\\d+)\\.xml$/)?.[1] || 0);
+    return na - nb;
+  });
+  if (!paths.length) throw new Error("Could not find readable document content. Please use a modern DOCX or PPTX file.");
+  const chunks: string[] = [];
+  for (const path of paths) {
+    const xml = await zip.file(path).async("text");
+    const doc = new DOMParser().parseFromString(xml, "application/xml");
+    if (doc.querySelector("parsererror")) throw new Error("This Office document is damaged or unsupported.");
+    const paragraphs = Array.from(doc.getElementsByTagName("a:p").length ? doc.getElementsByTagName("a:p") : doc.getElementsByTagName("w:p"));
+    const lines = paragraphs.map(p => Array.from(p.getElementsByTagName("a:t").length ? p.getElementsByTagName("a:t") : p.getElementsByTagName("w:t")).map(n => n.textContent || "").join("")).filter(Boolean);
+    chunks.push(lines.join("\\n"));
+  }
+  return chunks.join("\\n\\n");
+}
+async function makeOfficePdf(file: File, kind: "excel" | "word" | "powerpoint", rtl: boolean): Promise<Blob> {
+  const text = await officeText(file, kind);
+  if (!text.trim()) throw new Error("No readable text was found in this file.");
+  const bytes = await makeTextPdf(text, rtl);
+  return new Blob([bytes.buffer as ArrayBuffer], { type: "application/pdf" });
 }
 \nfunction loadImage(file: File): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -522,7 +571,7 @@ export default function TooloraApp() {
         <h2 id="guide-title">{t.faqTitle}</h2>
         <p className="guideIntro">{t.intro}</p>
         <div className="faqList">
-          {(["faq1", "faq2", "faq3", "faq4", "faq5", "faq6", "faq7", "faq8"] as const).map(key => (
+          {(["faq1", "faq2", "faq3", "faq4", "faq5", "faq6", "faq7", "faq8", "faq9"] as const).map(key => (
             <details className="faqItem" key={key}>
               <summary>{t[(key + "q") as keyof typeof t]}</summary>
               <p>{t[(key + "a") as keyof typeof t]}</p>
