@@ -9,7 +9,10 @@ export const metadata: Metadata = {
   keywords: ["free online tools", "image resizer", "image compressor", "PDF converter", "PDF to Word", "PDF to Excel", "Word to PDF", "Excel to PDF", "أدوات مجانية", "تحويل PDF"],
   openGraph: { type: "website", url: "https://tooloratooll.netlify.app", siteName: "Toolora", title: "Toolora — Free Online Image, PDF & Office Tools", description: "Free browser-based tools for images, PDF, Word, Excel and PowerPoint." },
   twitter: { card: "summary", title: "Toolora — Free Online Tools", description: "Free browser-based image, PDF and Office tools in Arabic and English." },
-  robots: { index: true, follow: true }
+  robots: { index: true, follow: true },
+  other: process.env.ADSENSE_PUBLISHER_ID
+    ? { "google-adsense-account": process.env.ADSENSE_PUBLISHER_ID }
+    : {}
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
