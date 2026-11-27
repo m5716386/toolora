@@ -365,7 +365,25 @@ export default function TooloraApp() {
         setOutput(new Blob([bytes.buffer as ArrayBuffer], { type: "application/pdf" }), "toolora-text.pdf", t.textDone);
         return;
       }
+      if (active === "textxlsx") {
+        if (!text.trim()) throw new Error(t.noText);
+        setOutput(await makeTextExcel(text), "toolora-data.xlsx", t.textDone);
+        return;
+      }
       if (!files.length) throw new Error(t.needFile);
+
+      if (active === "pdfexcel") {
+        setOutput(await makePdfExcel(files[0]), "toolora-data.xlsx", t.pdfexcel);
+        return;
+      }
+      if (active === "pdfword") {
+        setOutput(await makePdfWord(files[0]), "toolora-document.docx", t.pdfword);
+        return;
+      }
+      if (active === "pdfjpg") {
+        setOutput(await makePdfJpg(files[0]), "toolora-pages-jpg.zip", t.pdfjpg);
+        return;
+      }
 
       if (active === "imagepdf") {
         const pdf = await PDFDocument.create();
