@@ -399,8 +399,12 @@ export default function TooloraApp() {
   }), [query, t]);
 
   useEffect(() => {
-    const requestedLanguage = new URLSearchParams(window.location.search).get("lang");
+    const params = new URLSearchParams(window.location.search);
+    const requestedLanguage = params.get("lang");
+    const requestedTool = params.get("tool") as Tool | null;
     if (requestedLanguage === "ar") setLang("ar");
+    const validTools: Tool[] = ["resize", "compress", "textpdf", "imagepdf", "pdfexcel", "textxlsx", "pdfword", "pdfjpg", "excelpdf", "wordpdf", "pptpdf"];
+    if (requestedTool && validTools.includes(requestedTool)) setActive(requestedTool);
   }, []);
 
   useEffect(() => {
@@ -424,6 +428,9 @@ export default function TooloraApp() {
     setFiles([]);
     setText("");
     resetOutput();
+    const nextUrl = new URL(window.location.href);
+    nextUrl.searchParams.set("tool", id);
+    window.history.replaceState({}, "", nextUrl);
   }
 
   function setOutput(blob: Blob, name: string, message: string) {
