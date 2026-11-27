@@ -615,6 +615,31 @@ export default function TooloraApp() {
         </div>
       </div>
     </section>
+    <section className="guideSection" aria-labelledby="resources-title">
+      <div className="guideInner">
+        {rtl ? <>
+          <span className="sectionKicker">مركز المساعدة</span>
+          <h2 id="resources-title">تعلم كيف تستخدم أدوات Toolora</h2>
+          <p className="guideIntro">أدلة عملية تشرح خطوات التحويل، والصيغ المدعومة، والنتائج المتوقعة، وكيف تتجنب المشاكل الشائعة قبل تنزيل ملفاتك.</p>
+          <div className="faqList">
+            <article className="faqItem"><h3>أدوات الصور</h3><p>تعرف على تغيير أبعاد الصور، والحفاظ على تناسبها، وتقليل حجمها مع مراجعة الجودة.</p><a href="/guides/image-tools">اقرأ دليل الصور ←</a></article>
+            <article className="faqItem"><h3>أدوات PDF</h3><p>تعرف على إنشاء ملفات PDF وتحويلها إلى Word أو Excel أو صور، والفرق بين PDF النصي والممسوح ضوئياً.</p><a href="/guides/pdf-tools">اقرأ دليل PDF ←</a></article>
+            <article className="faqItem"><h3>أدوات Office</h3><p>تعرف على تحويل ملفات Word وExcel وPowerPoint والصيغ المدعومة وحدود الحفاظ على التنسيق.</p><a href="/guides/office-tools">اقرأ دليل Office ←</a></article>
+          </div>
+          <p className="guideIntro" style={{marginTop:22}}>هل وجدت مشكلة أو عندك اقتراح؟ <a href="/contact">تواصل مع فريق Toolora</a>. ويمكنك معرفة المزيد عن <a href="/about">الموقع وطريقة عمله</a> وقراءة <a href="/privacy">سياسة الخصوصية</a>.</p>
+        </> : <>
+          <span className="sectionKicker">HELP & LEARNING CENTER</span>
+          <h2 id="resources-title">Learn how to get better results with Toolora</h2>
+          <p className="guideIntro">Explore practical guides covering conversion steps, supported formats, expected results and common issues to check before downloading your files.</p>
+          <div className="faqList">
+            <article className="faqItem"><h3>Image tools</h3><p>Learn about image dimensions, keeping the correct aspect ratio and reducing file size while checking output quality.</p><a href="/guides/image-tools">Read the image guide →</a></article>
+            <article className="faqItem"><h3>PDF tools</h3><p>Learn how to create PDFs and convert them to Word, Excel or images, including the difference between text PDFs and scanned files.</p><a href="/guides/pdf-tools">Read the PDF guide →</a></article>
+            <article className="faqItem"><h3>Office tools</h3><p>Learn how to convert Word, Excel and PowerPoint files, which formats are supported and what happens to document formatting.</p><a href="/guides/office-tools">Read the Office guide →</a></article>
+          </div>
+          <p className="guideIntro" style={{marginTop:22}}>Found an issue or have a suggestion? <a href="/contact">Contact the Toolora team</a>. You can also learn <a href="/about">about the website</a> and read our <a href="/privacy">privacy policy</a>.</p>
+        </>}
+      </div>
+    </section>
     <footer className="footer"><div className="footerBrand"><span className="brandIcon">T</span> Toolora</div><p>{t.footer}</p><div className="footerLinks"><a href="/about">About</a><a href="/guides">Guides</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/contact">Contact</a></div><small>© {new Date().getFullYear()} Toolora</small></footer>
   </main>;
 }
