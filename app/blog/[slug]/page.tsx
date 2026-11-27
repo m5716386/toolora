@@ -99,7 +99,7 @@ export function generateStaticParams() { return articles.map(article => ({slug:a
 export async function generateMetadata({params,searchParams}:{params:Promise<{slug:string}>;searchParams:Promise<{lang?:string}>}):Promise<Metadata>{
  const {slug}=await params; const {lang}=await searchParams; const a=articles.find(x=>x.slug===slug); if(!a)return {};
  const ar=lang==="ar"; const title=ar?a.arTitle:a.enTitle; const description=ar?a.arDescription:a.enDescription;
- return {title,description,alternates:{canonical:`/blog/${slug}`},openGraph:{title,description,type:"article",url:`https://tooloratooll.netlify.app/blog/${slug}`},twitter:{card:"summary",title,description}};
+ return {title,description,alternates:{canonical:`/blog/${slug}`,languages:{en:`/blog/${slug}`,ar:`/blog/${slug}?lang=ar`}},openGraph:{title,description,type:"article",url:`https://tooloratooll.netlify.app/blog/${slug}`},twitter:{card:"summary",title,description}};
 }
 export default async function BlogArticle({params,searchParams}:{params:Promise<{slug:string}>;searchParams:Promise<{lang?:string}>}){
  const {slug}=await params; const {lang}=await searchParams; const a=articles.find(x=>x.slug===slug); if(!a)notFound();
