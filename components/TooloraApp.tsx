@@ -50,6 +50,7 @@ const copy = {
     faq4a: "The tools currently available on Toolora are free to use. Keep a copy of important original files before processing them.",
     noText: "Please enter some text first.",
     pdfexcel: "PDF to Excel", textxlsx: "Text to Excel", pdfword: "PDF to Word", pdfjpg: "PDF to JPG",
+    textExcelDone: "Your Excel file is ready.",
     pdfHint: "Choose a PDF file", textExcelHint: "Paste rows using commas, tabs or new lines.",
     conversionNote: "PDF conversion works best with text-based PDFs. Scanned documents may require OCR, and converted tables or formatting may need review.",
     jpgPdfNote: "Images to PDF also accepts JPG files.",
@@ -101,6 +102,7 @@ const copy = {
     faq4a: "الأدوات المتاحة حالياً في Toolora مجانية. ننصحك بالاحتفاظ بنسخة من ملفاتك الأصلية المهمة قبل معالجتها.",
     noText: "اكتب نصاً أولاً.",
     pdfexcel: "تحويل PDF إلى Excel", textxlsx: "تحويل النص إلى Excel", pdfword: "تحويل PDF إلى Word", pdfjpg: "تحويل PDF إلى صور JPG",
+    textExcelDone: "ملف Excel جاهز للتنزيل.",
     pdfHint: "اختار ملف PDF", textExcelHint: "الصق البيانات، وافصل الأعمدة بفواصل أو علامات جدولة، والصفوف بأسطر جديدة.",
     conversionNote: "أفضل نتيجة تكون مع ملفات PDF النصية. الملفات الممسوحة ضوئياً تحتاج OCR، وقد تحتاج الجداول والتنسيقات إلى مراجعة بعد التحويل.",
     jpgPdfNote: "أداة تحويل الصور إلى PDF تقبل صور JPG أيضاً.",
@@ -375,7 +377,7 @@ export default function TooloraApp() {
       }
       if (active === "textxlsx") {
         if (!text.trim()) throw new Error(t.noText);
-        setOutput(await makeTextExcel(text), "toolora-data.xlsx", t.textDone);
+        setOutput(await makeTextExcel(text), "toolora-data.xlsx", t.textExcelDone);
         return;
       }
       if (!files.length) throw new Error(t.needFile);
