@@ -142,22 +142,24 @@ declare global {
 const scriptLoads: Partial<Record<string, Promise<void>>> = {};
 function loadLibrary(src: string, ready: () => boolean): Promise<void> {
   if (ready()) return Promise.resolve();
-  if (scriptLoads[src]) return scriptLoads[src];
-  scriptLoads[src] = new Promise((resolve, reject) => {
+  if (scriptLoads[src]) return scriptLoads[src]!;
+  const loading: Promise<void> = new Promise<void>((resolve, reject) => {
     const existing = document.querySelector(`script[data-toolora-lib="${src}"]`) as HTMLScriptElement | null;
     const script = existing || document.createElement("script");
     script.src = src;
     script.async = true;
     script.dataset.tooloraLib = src;
-    script.onload = () => ready() ? resolve() : reject(new Error("A conversion library could not be initialized."));
+    script.onload = () => ready() ? resolve(undefined) : reject(new Error("A conversion library could not be initialized."));
     script.onerror = () => reject(new Error("Could not load a required conversion library. Check your internet connection and try again."));
     if (!existing) document.head.appendChild(script);
-  }).catch(error => {
+  });
+  const tracked: Promise<void> = loading.catch(error => {
     delete scriptLoads[src];
     document.querySelector(`script[data-toolora-lib="${src}"]`)?.remove();
     throw error;
   });
-  return scriptLoads[src];
+  scriptLoads[src] = tracked;
+  return tracked;
 }
 async function getPdfJs() {
   await loadLibrary("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js", () => !!window.pdfjsLib);
