@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { PDFDocument } from "pdf-lib";
 
 type Lang = "en" | "ar";
-type Tool = "resize" | "compress" | "textpdf" | "imagepdf";
+type Tool = "resize" | "compress" | "textpdf" | "imagepdf" | "pdfexcel" | "textxlsx" | "pdfword" | "pdfjpg";
 
 const copy = {
   en: {
@@ -48,7 +48,11 @@ const copy = {
     faq3a: "Yes. Choose the Images to PDF tool, select multiple images, and create one PDF with each image placed on its own page.",
     faq4q: "Is there a cost to use the tools?",
     faq4a: "The tools currently available on Toolora are free to use. Keep a copy of important original files before processing them.",
-    noText: "Please enter some text first."
+    noText: "Please enter some text first.",
+    pdfexcel: "PDF to Excel", textxlsx: "Text to Excel", pdfword: "PDF to Word", pdfjpg: "PDF to JPG",
+    pdfHint: "Choose a PDF file", textExcelHint: "Paste rows using commas, tabs or new lines.",
+    conversionNote: "PDF conversion works best with text-based PDFs. Scanned documents may require OCR, and converted tables or formatting may need review.",
+    jpgPdfNote: "Images to PDF also accepts JPG files."
   },
   ar: {
     tagline: "أدوات بسيطة. نتائج ممتازة.",
@@ -91,7 +95,11 @@ const copy = {
     faq3a: "نعم. اختار أداة تحويل الصور إلى PDF، وحدد أكثر من صورة، وبعدها أنشئ ملفاً واحداً يحتوي على كل صورة في صفحة مستقلة.",
     faq4q: "هل استخدام الأدوات مجاني؟",
     faq4a: "الأدوات المتاحة حالياً في Toolora مجانية. ننصحك بالاحتفاظ بنسخة من ملفاتك الأصلية المهمة قبل معالجتها.",
-    noText: "اكتب نصاً أولاً."
+    noText: "اكتب نصاً أولاً.",
+    pdfexcel: "تحويل PDF إلى Excel", textxlsx: "تحويل النص إلى Excel", pdfword: "تحويل PDF إلى Word", pdfjpg: "تحويل PDF إلى صور JPG",
+    pdfHint: "اختار ملف PDF", textExcelHint: "الصق البيانات، وافصل الأعمدة بفواصل أو علامات جدولة، والصفوف بأسطر جديدة.",
+    conversionNote: "أفضل نتيجة تكون مع ملفات PDF النصية. الملفات الممسوحة ضوئياً تحتاج OCR، وقد تحتاج الجداول والتنسيقات إلى مراجعة بعد التحويل.",
+    jpgPdfNote: "أداة تحويل الصور إلى PDF تقبل صور JPG أيضاً."
   }
 };
 
@@ -99,10 +107,119 @@ const tools: { id: Tool; group: "images" | "pdf"; icon: string }[] = [
   { id: "resize", group: "images", icon: "↔️" },
   { id: "compress", group: "images", icon: "🗜️" },
   { id: "textpdf", group: "pdf", icon: "📝" },
-  { id: "imagepdf", group: "pdf", icon: "🖼️" }
+  { id: "imagepdf", group: "pdf", icon: "🖼️" },
+  { id: "pdfexcel", group: "pdf", icon: "📊" },
+  { id: "textxlsx", group: "pdf", icon: "📋" },
+  { id: "pdfword", group: "pdf", icon: "📝" },
+  { id: "pdfjpg", group: "pdf", icon: "🖼️" }
 ];
 
-function loadImage(file: File): Promise<HTMLImageElement> {
+
+declare global {
+  interface Window { pdfjsLib?: any; XLSX?: any; docx?: any; JSZip?: any; }
+}
+const scriptLoads: Record<string, Promise<void>> = {};
+function loadLibrary(src: string, ready: () => boolean): Promise<void> {
+  if (ready()) return Promise.resolve();
+  if (scriptLoads[src]) return scriptLoads[src];
+  scriptLoads[src] = new Promise((resolve, reject) => {
+    const existing = document.querySelector(`script[data-toolora-lib="${src}"]`) as HTMLScriptElement | null;
+    const script = existing || document.createElement("script");
+    script.src = src;
+    script.async = true;
+    script.dataset.tooloraLib = src;
+    script.onload = () => ready() ? resolve() : reject(new Error("A conversion library could not be initialized."));
+    script.onerror = () => reject(new Error("Could not load a required conversion library. Check your internet connection and try again."));
+    if (!existing) document.head.appendChild(script);
+  });
+  return scriptLoads[src];
+}
+async function getPdfJs() {
+  await loadLibrary("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js", () => !!window.pdfjsLib);
+  window.pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  return window.pdfjsLib;
+}
+async function extractPdfLines(file: File): Promise<string[][]> {
+  const pdfjs = await getPdfJs();
+  const pdf = await pdfjs.getDocument({ data: new Uint8Array(await file.arrayBuffer()) }).promise;
+  const allRows: string[][] = [];
+  for (let pageNo = 1; pageNo <= pdf.numPages; pageNo++) {
+    const page = await pdf.getPage(pageNo);
+    const content = await page.getTextContent();
+    const items = content.items.filter((item: any) => typeof item.str === "string" && item.str.trim()).map((item: any) => ({ text: item.str.trim(), x: item.transform[4], y: item.transform[5] }));
+    const grouped: { y: number; items: { text: string; x: number }[] }[] = [];
+    for (const item of items) {
+      let line = grouped.find(row => Math.abs(row.y - item.y) < 4);
+      if (!line) { line = { y: item.y, items: [] }; grouped.push(line); }
+      line.items.push({ text: item.text, x: item.x });
+    }
+    grouped.sort((a,b) => b.y-a.y);
+    for (const line of grouped) {
+      line.items.sort((a,b) => a.x-b.x);
+      const cells: string[] = [];
+      let previousX = Number.NaN;
+      for (const item of line.items) {
+        if (Number.isFinite(previousX) && item.x - previousX > 38) cells.push("");
+        cells.push(item.text);
+        previousX = item.x;
+      }
+      allRows.push(cells);
+    }
+    allRows.push([""]);
+  }
+  return allRows;
+}
+async function pdfText(file: File): Promise<string> {
+  const rows = await extractPdfLines(file);
+  return rows.map(row => row.join(" ")).join("\n").trim();
+}
+async function makePdfExcel(file: File): Promise<Blob> {
+  await loadLibrary("https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js", () => !!window.XLSX);
+  const rows = await extractPdfLines(file);
+  const normalized = rows.map(row => row.length > 1 ? row : (row[0] || "").split(/\\s{2,}|\\t/).map(x => x.trim())).filter(row => row.some(cell => cell.trim()));
+  const sheet = window.XLSX.utils.aoa_to_sheet(normalized);
+  const book = window.XLSX.utils.book_new();
+  window.XLSX.utils.book_append_sheet(book, sheet, "PDF Data");
+  return new Blob([window.XLSX.write(book, { bookType: "xlsx", type: "array" })], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+}
+async function makeTextExcel(value: string): Promise<Blob> {
+  await loadLibrary("https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js", () => !!window.XLSX);
+  const lines = value.replace(/\\r/g, "").split("\\n").filter(line => line.trim());
+  const rows = lines.map(line => {
+    const delimiter = line.includes("\\t") ? "\\t" : line.includes(";") ? ";" : line.includes(",") ? "," : null;
+    return delimiter ? line.split(delimiter).map(cell => cell.trim()) : [line.trim()];
+  });
+  const sheet = window.XLSX.utils.aoa_to_sheet(rows);
+  const book = window.XLSX.utils.book_new();
+  window.XLSX.utils.book_append_sheet(book, sheet, "Text Data");
+  return new Blob([window.XLSX.write(book, { bookType: "xlsx", type: "array" })], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+}
+async function makePdfWord(file: File): Promise<Blob> {
+  await loadLibrary("https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js", () => !!window.docx);
+  const content = await pdfText(file);
+  const paragraphs = content.split("\\n").map(line => new window.docx.Paragraph({ children: [new window.docx.TextRun(line)] }));
+  const documentFile = new window.docx.Document({ sections: [{ children: paragraphs }] });
+  return window.docx.Packer.toBlob(documentFile);
+}
+async function makePdfJpg(file: File): Promise<Blob> {
+  const pdfjs = await getPdfJs();
+  await loadLibrary("https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js", () => !!window.JSZip);
+  const pdf = await pdfjs.getDocument({ data: new Uint8Array(await file.arrayBuffer()) }).promise;
+  const zip = new window.JSZip();
+  for (let pageNo = 1; pageNo <= pdf.numPages; pageNo++) {
+    const page = await pdf.getPage(pageNo);
+    const viewport = page.getViewport({ scale: 1.6 });
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.ceil(viewport.width); canvas.height = Math.ceil(viewport.height);
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("Your browser could not render this PDF page.");
+    await page.render({ canvasContext: context, viewport }).promise;
+    const blob: Blob = await new Promise((resolve, reject) => canvas.toBlob(result => result ? resolve(result) : reject(new Error("Could not create JPG image.")), "image/jpeg", 0.92));
+    zip.file(`page-${String(pageNo).padStart(3, "0")}.jpg`, await blob.arrayBuffer());
+  }
+  return zip.generateAsync({ type: "blob", mimeType: "application/zip" });
+}
+\nfunction loadImage(file: File): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(file);
     const image = new Image();
