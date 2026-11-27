@@ -598,6 +598,6 @@ export default function TooloraApp() {
         </div>
       </div>
     </section>
-    <footer className="footer"><div className="footerBrand"><span className="brandIcon">T</span> Toolora</div><p>{t.footer}</p><div className="footerLinks"><a href="/about">About</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/contact">Contact</a></div><small>© {new Date().getFullYear()} Toolora</small></footer>
+    <footer className="footer"><div className="footerBrand"><span className="brandIcon">T</span> Toolora</div><p>{t.footer}</p><div className="footerLinks"><a href="/about">About</a><a href="/guides">Guides</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/contact">Contact</a></div><small>© {new Date().getFullYear()} Toolora</small></footer>
   </main>;
 }
