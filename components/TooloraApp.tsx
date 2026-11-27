@@ -240,7 +240,7 @@ async function makePdfJpg(file: File): Promise<Blob> {
   }
   return zip.generateAsync({ type: "blob", mimeType: "application/zip" });
 }
-\n
+
 async function officeText(file: File, kind: "excel" | "word" | "powerpoint"): Promise<string> {
   if (kind === "excel") {
     await loadLibrary("https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js", () => !!window.XLSX);
