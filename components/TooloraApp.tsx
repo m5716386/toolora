@@ -534,7 +534,7 @@ export default function TooloraApp() {
 
   return <main dir={rtl ? "rtl" : "ltr"} className="page">
     <header className="topbar">
-      <button className="brand" onClick={() => { setActive(null); resetOutput(); }}><span className="brandIcon">T</span> Toolora</button>
+      <button className="brand" onClick={() => { setActive(null); resetOutput(); const nextUrl = new URL(window.location.href); nextUrl.searchParams.delete("tool"); window.history.replaceState({}, "", nextUrl); }}><span className="brandIcon">T</span> Toolora</button>
       <div className="topActions">
         <a href="#tools" className="navLink">{t.all}</a>
         <button className="langButton" onClick={() => {
@@ -611,6 +611,21 @@ export default function TooloraApp() {
         {error && <div className="errorBox">{error}</div>}
         {result && <div className="resultBox"><strong>{t.result}</strong><p>{result}</p>{downloadUrl && <a className="downloadButton" href={downloadUrl} download={downloadName}>{t.download}</a>}</div>}
       </section>}
+    </section>
+
+    <section className="guideSection" aria-labelledby="individual-tools-title">
+      <div className="guideInner">
+        <span className="sectionKicker">{rtl ? "صفحات الأدوات" : "TOOL DIRECTORY"}</span>
+        <h2 id="individual-tools-title">{rtl ? "تفاصيل كل أداة وطريقة استخدامها" : "Explore each tool and how it works"}</h2>
+        <p className="guideIntro">{rtl ? "افتح صفحة أي أداة لمعرفة الصيغ المدعومة وخطوات الاستخدام والنتائج المتوقعة والأسئلة الشائعة." : "Visit an individual tool page for supported formats, step-by-step instructions, expected results and frequently asked questions."}</p>
+        <div className="faqList">
+          {tools.map(item => <article className="faqItem" key={item.id}>
+            <h3>{item.icon} {t[item.id]}</h3>
+            <p>{rtl ? "شرح الاستخدام والصيغ المدعومة والملاحظات المهمة." : "Learn how to use it, which formats are supported and what to expect."}</p>
+            <a href={`/tools/${item.id}${rtl ? "?lang=ar" : ""}`}>{rtl ? "اعرف المزيد ←" : "Learn more →"}</a>
+          </article>)}
+        </div>
+      </div>
     </section>
 
     <section className="guideSection" aria-labelledby="guide-title">
