@@ -342,6 +342,21 @@ export default function TooloraApp() {
       </section>}
     </section>
 
+    <section className="guideSection" aria-labelledby="guide-title">
+      <div className="guideInner">
+        <span className="sectionKicker">TOOLORA GUIDE</span>
+        <h2 id="guide-title">{t.faqTitle}</h2>
+        <p className="guideIntro">{t.intro}</p>
+        <div className="faqList">
+          {(["faq1", "faq2", "faq3", "faq4"] as const).map(key => (
+            <details className="faqItem" key={key}>
+              <summary>{t[(key + "q") as keyof typeof t]}</summary>
+              <p>{t[(key + "a") as keyof typeof t]}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
     <footer className="footer"><div className="footerBrand"><span className="brandIcon">T</span> Toolora</div><p>{t.footer}</p><div className="footerLinks"><a href="/about">About</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="mailto:awwazmohammed@gmail.com">Contact</a></div><small>© {new Date().getFullYear()} Toolora</small></footer>
   </main>;
 }
