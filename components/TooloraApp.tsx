@@ -643,6 +643,33 @@ export default function TooloraApp() {
         </div>
       </div>
     </section>
+    <section className="guideSection" aria-labelledby="blog-title">
+      <div className="guideInner">
+        {rtl ? <>
+          <span className="sectionKicker">مقالات ونصائح</span>
+          <h2 id="blog-title">حلول عملية لمشاكل الصور وملفات PDF</h2>
+          <p className="guideIntro">مقالات تشرح كيف تقلل حجم الصور، وتجهزها للمواقع، وتحول ملفات PDF وتراجع النتائج قبل استخدامها.</p>
+          <div className="faqList">
+            <article className="faqItem"><h3>ضغط صورة إلى 100 كيلوبايت</h3><p>تعرف على تقليل الأبعاد والجودة للوصول إلى حجم مناسب للنماذج والمواقع.</p><a href="/blog/compress-image-to-100kb?lang=ar">اقرأ المقال ←</a></article>
+            <article className="faqItem"><h3>تغيير أبعاد صورة للموقع</h3><p>اختار مقاساً مناسباً وحافظ على تناسب الصورة قبل رفعها.</p><a href="/blog/resize-image-for-website?lang=ar">اقرأ المقال ←</a></article>
+            <article className="faqItem"><h3>تحويل PDF إلى Excel</h3><p>افهم استخراج الجداول والفرق بين ملفات PDF النصية والممسوحة ضوئياً.</p><a href="/blog/convert-pdf-to-excel?lang=ar">اقرأ المقال ←</a></article>
+            <article className="faqItem"><h3>جمع الصور في PDF واحد</h3><p>رتب صورك وحولها إلى مستند واحد قابل للمشاركة.</p><a href="/blog/combine-images-into-pdf?lang=ar">اقرأ المقال ←</a></article>
+          </div>
+          <p className="guideIntro"><a href="/blog?lang=ar">شوف كل مقالات Toolora ←</a></p>
+        </> : <>
+          <span className="sectionKicker">TIPS & HOW-TO ARTICLES</span>
+          <h2 id="blog-title">Practical answers to common image and PDF problems</h2>
+          <p className="guideIntro">Learn how to reduce image size, prepare pictures for websites, convert PDF files and check the results before using them.</p>
+          <div className="faqList">
+            <article className="faqItem"><h3>Compress an image to 100KB</h3><p>Learn how to reduce dimensions and quality for online forms and websites.</p><a href="/blog/compress-image-to-100kb">Read the article →</a></article>
+            <article className="faqItem"><h3>Resize an image for a website</h3><p>Choose practical dimensions and preserve the image aspect ratio.</p><a href="/blog/resize-image-for-website">Read the article →</a></article>
+            <article className="faqItem"><h3>Convert PDF to Excel</h3><p>Understand table extraction and the difference between text PDFs and scanned pages.</p><a href="/blog/convert-pdf-to-excel">Read the article →</a></article>
+            <article className="faqItem"><h3>Combine images into one PDF</h3><p>Organize your pictures and convert them into one shareable document.</p><a href="/blog/combine-images-into-pdf">Read the article →</a></article>
+          </div>
+          <p className="guideIntro"><a href="/blog">Explore all Toolora articles →</a></p>
+        </>}
+      </div>
+    </section>
     <section className="guideSection" aria-labelledby="resources-title">
       <div className="guideInner">
         {rtl ? <>
