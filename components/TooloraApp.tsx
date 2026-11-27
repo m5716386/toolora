@@ -52,7 +52,11 @@ const copy = {
     pdfexcel: "PDF to Excel", textxlsx: "Text to Excel", pdfword: "PDF to Word", pdfjpg: "PDF to JPG",
     pdfHint: "Choose a PDF file", textExcelHint: "Paste rows using commas, tabs or new lines.",
     conversionNote: "PDF conversion works best with text-based PDFs. Scanned documents may require OCR, and converted tables or formatting may need review.",
-    jpgPdfNote: "Images to PDF also accepts JPG files."
+    jpgPdfNote: "Images to PDF also accepts JPG files.",
+    faq5q: "Can every PDF be converted accurately?", faq5a: "Text-based PDFs usually convert best. Scanned PDFs are images and need OCR before their text or tables can be extracted. Always review converted spreadsheets.",
+    faq6q: "Will PDF to Word keep the original layout?", faq6a: "The converter extracts readable text into a Word document. Complex layouts, columns, images and tables may not look exactly like the original.",
+    faq7q: "How do I convert PDF pages to JPG?", faq7a: "Choose PDF to JPG, select a PDF, and download a ZIP archive containing one JPG image for each page.",
+    faq8q: "How do I turn text into an Excel file?", faq8a: "Paste your data into Text to Excel. Separate columns with commas, semicolons or tabs, and put each row on a new line."
   },
   ar: {
     tagline: "أدوات بسيطة. نتائج ممتازة.",
@@ -99,7 +103,11 @@ const copy = {
     pdfexcel: "تحويل PDF إلى Excel", textxlsx: "تحويل النص إلى Excel", pdfword: "تحويل PDF إلى Word", pdfjpg: "تحويل PDF إلى صور JPG",
     pdfHint: "اختار ملف PDF", textExcelHint: "الصق البيانات، وافصل الأعمدة بفواصل أو علامات جدولة، والصفوف بأسطر جديدة.",
     conversionNote: "أفضل نتيجة تكون مع ملفات PDF النصية. الملفات الممسوحة ضوئياً تحتاج OCR، وقد تحتاج الجداول والتنسيقات إلى مراجعة بعد التحويل.",
-    jpgPdfNote: "أداة تحويل الصور إلى PDF تقبل صور JPG أيضاً."
+    jpgPdfNote: "أداة تحويل الصور إلى PDF تقبل صور JPG أيضاً.",
+    faq5q: "هل يمكن تحويل كل ملفات PDF بدقة كاملة؟", faq5a: "الملفات التي تحتوي على نصوص تعطي عادةً أفضل نتيجة. أما الملفات الممسوحة ضوئياً فهي صور وتحتاج OCR لاستخراج النصوص والجداول. راجع ملف Excel بعد التحويل.",
+    faq6q: "هل يحافظ تحويل PDF إلى Word على نفس التنسيق؟", faq6a: "الأداة تستخرج النص المقروء وتضعه في مستند Word. التنسيقات المعقدة والأعمدة والصور والجداول قد لا تظهر مثل الملف الأصلي تماماً.",
+    faq7q: "كيف نحول صفحات PDF إلى صور JPG؟", faq7a: "اختار أداة PDF إلى JPG وحدد ملف PDF، وبعد التحويل نزّل ملف ZIP يحتوي على صورة JPG مستقلة لكل صفحة.",
+    faq8q: "كيف نحول النص إلى ملف Excel؟", faq8a: "الصق بياناتك في أداة النص إلى Excel. افصل الأعمدة بفواصل أو فاصلة منقوطة أو علامات جدولة، وضع كل صف في سطر جديد."
   }
 };
 
@@ -512,7 +520,7 @@ export default function TooloraApp() {
         <h2 id="guide-title">{t.faqTitle}</h2>
         <p className="guideIntro">{t.intro}</p>
         <div className="faqList">
-          {(["faq1", "faq2", "faq3", "faq4"] as const).map(key => (
+          {(["faq1", "faq2", "faq3", "faq4", "faq5", "faq6", "faq7", "faq8"] as const).map(key => (
             <details className="faqItem" key={key}>
               <summary>{t[(key + "q") as keyof typeof t]}</summary>
               <p>{t[(key + "a") as keyof typeof t]}</p>
