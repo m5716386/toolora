@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Toolora — Free Online Tools",
   description: "Free online PDF, image, calculator and text tools. أدوات مجانية للـ PDF والصور والحسابات والنصوص.",
-  metadataBase: new URL("https://toolora.example"),
+  metadataBase: new URL("https://tooloratooll.netlify.app"),
   alternates: { languages: { en: "/", ar: "/?lang=ar" } },
   robots: { index: true, follow: true }
 };
