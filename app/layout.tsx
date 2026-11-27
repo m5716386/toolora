@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Toolora — Free Image & PDF Tools",
-  description: "Free online image, PDF, Word and Excel conversion tools. Convert PDF to Excel, Word and JPG, text to Excel, and images to PDF. أدوات مجانية للصور وPDF وWord وExcel.",
+  description: "Free online image, PDF, Word and Excel conversion tools. Convert PDF to Excel, Word and JPG, Excel, Word and PowerPoint to PDF, text to Excel, and images to PDF. أدوات مجانية للصور وPDF وWord وExcel وPowerPoint.",
   metadataBase: new URL("https://tooloratooll.netlify.app"),
   alternates: { languages: { en: "/", ar: "/?lang=ar" } },
   robots: { index: true, follow: true }
