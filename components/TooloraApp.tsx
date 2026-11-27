@@ -446,6 +446,11 @@ export default function TooloraApp() {
         setOutput(await makePdfJpg(files[0]), "toolora-pages-jpg.zip", t.pdfjpg);
         return;
       }
+      if (active === "excelpdf" || active === "wordpdf" || active === "pptpdf") {
+        const kind = active === "excelpdf" ? "excel" : active === "wordpdf" ? "word" : "powerpoint";
+        setOutput(await makeOfficePdf(files[0], kind, rtl), "toolora-office.pdf", t.officeDone);
+        return;
+      }
 
       if (active === "imagepdf") {
         const pdf = await PDFDocument.create();
@@ -553,6 +558,16 @@ export default function TooloraApp() {
           </label>
           {files.length > 0 && <p className="fileList">{files.map(f => f.name).join(" • ")}</p>}
           <p className="privacyNote">{t.conversionNote}</p>
+          <button className="primaryButton" onClick={processTool}>{t.run}</button>
+          <p className="privacyNote">🔒 {t.privacy}</p>
+        </div>}
+
+        {(active === "excelpdf" || active === "wordpdf" || active === "pptpdf") && <div className="toolForm">
+          <label className="uploadBox"><span className="uploadIcon">＋</span><strong>{t.select}</strong><small>{t.officeHint}</small>
+            <input type="file" accept={active === "excelpdf" ? ".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" : active === "wordpdf" ? ".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" : ".pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation"} onChange={e => setFiles(Array.from(e.target.files || []))} />
+          </label>
+          {files.length > 0 && <p className="fileList">{files.map(f => f.name).join(" • ")}</p>}
+          <p className="privacyNote">{t.officeNote}</p>
           <button className="primaryButton" onClick={processTool}>{t.run}</button>
           <p className="privacyNote">🔒 {t.privacy}</p>
         </div>}
