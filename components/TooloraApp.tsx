@@ -242,22 +242,22 @@ async function makePdfJpg(file: File): Promise<Blob> {
 }
 \n
 async function officeText(file: File, kind: "excel" | "word" | "powerpoint"): Promise<string> {
-  await loadLibrary("https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js", () => !!window.JSZip);
-  const zip = await window.JSZip.loadAsync(await file.arrayBuffer());
   if (kind === "excel") {
     await loadLibrary("https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js", () => !!window.XLSX);
     const workbook = window.XLSX.read(await file.arrayBuffer(), { type: "array" });
     return workbook.SheetNames.map((name: string) => {
       const csv = window.XLSX.utils.sheet_to_csv(workbook.Sheets[name], { FS: " | " });
-      return "Sheet: " + name + "\\n" + csv;
-    }).join("\\n\\n");
+      return "Sheet: " + name + "\n" + csv;
+    }).join("\n\n");
   }
+  await loadLibrary("https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js", () => !!window.JSZip);
+  const zip = await window.JSZip.loadAsync(await file.arrayBuffer());
   const paths = Object.keys(zip.files).filter(path =>
     kind === "word" ? path === "word/document.xml" :
-    /^ppt\\/slides\\/slide\\d+\\.xml$/.test(path)
+    /^ppt\/slides\/slide\d+\.xml$/.test(path)
   ).sort((a,b) => {
-    const na = Number(a.match(/(\\d+)\\.xml$/)?.[1] || 0);
-    const nb = Number(b.match(/(\\d+)\\.xml$/)?.[1] || 0);
+    const na = Number(a.match(/(\d+)\.xml$/)?.[1] || 0);
+    const nb = Number(b.match(/(\d+)\.xml$/)?.[1] || 0);
     return na - nb;
   });
   if (!paths.length) throw new Error("Could not find readable document content. Please use a modern DOCX or PPTX file.");
@@ -266,11 +266,13 @@ async function officeText(file: File, kind: "excel" | "word" | "powerpoint"): Pr
     const xml = await zip.file(path).async("text");
     const doc = new DOMParser().parseFromString(xml, "application/xml");
     if (doc.querySelector("parsererror")) throw new Error("This Office document is damaged or unsupported.");
-    const paragraphs = Array.from(doc.getElementsByTagName("a:p").length ? doc.getElementsByTagName("a:p") : doc.getElementsByTagName("w:p"));
-    const lines = paragraphs.map(p => Array.from(p.getElementsByTagName("a:t").length ? p.getElementsByTagName("a:t") : p.getElementsByTagName("w:t")).map(n => n.textContent || "").join("")).filter(Boolean);
-    chunks.push(lines.join("\\n"));
+    const paragraphTags = kind === "word" ? "w:p" : "a:p";
+    const textTags = kind === "word" ? "w:t" : "a:t";
+    const paragraphs = Array.from(doc.getElementsByTagName(paragraphTags));
+    const lines = paragraphs.map(p => Array.from(p.getElementsByTagName(textTags)).map(n => n.textContent || "").join("")).filter(Boolean);
+    chunks.push(lines.join("\n"));
   }
-  return chunks.join("\\n\\n");
+  return chunks.join("\n\n");
 }
 async function makeOfficePdf(file: File, kind: "excel" | "word" | "powerpoint", rtl: boolean): Promise<Blob> {
   const text = await officeText(file, kind);
@@ -278,7 +280,8 @@ async function makeOfficePdf(file: File, kind: "excel" | "word" | "powerpoint", 
   const bytes = await makeTextPdf(text, rtl);
   return new Blob([bytes.buffer as ArrayBuffer], { type: "application/pdf" });
 }
-\nfunction loadImage(file: File): Promise<HTMLImageElement> {
+
+function loadImage(file: File): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(file);
     const image = new Image();
