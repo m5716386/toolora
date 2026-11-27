@@ -393,6 +393,16 @@ export default function TooloraApp() {
   }), [query, t]);
 
   useEffect(() => {
+    const requestedLanguage = new URLSearchParams(window.location.search).get("lang");
+    if (requestedLanguage === "ar") setLang("ar");
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+  }, [lang]);
+
+  useEffect(() => {
     if (active) workspaceRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [active]);
 
@@ -514,7 +524,14 @@ export default function TooloraApp() {
       <button className="brand" onClick={() => { setActive(null); resetOutput(); }}><span className="brandIcon">T</span> Toolora</button>
       <div className="topActions">
         <a href="#tools" className="navLink">{t.all}</a>
-        <button className="langButton" onClick={() => setLang(lang === "en" ? "ar" : "en")}>{lang === "en" ? "العربية" : "English"}</button>
+        <button className="langButton" onClick={() => {
+          const nextLanguage: Lang = lang === "en" ? "ar" : "en";
+          setLang(nextLanguage);
+          const nextUrl = new URL(window.location.href);
+          if (nextLanguage === "ar") nextUrl.searchParams.set("lang", "ar");
+          else nextUrl.searchParams.delete("lang");
+          window.history.replaceState({}, "", nextUrl);
+        }}>{lang === "en" ? "العربية" : "English"}</button>
       </div>
     </header>
 
